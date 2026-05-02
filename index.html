@@ -1,30 +1,189 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><title>Ango Dialect Classifier</title>
-<style>*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif}body{background:#f5f5f5;padding:32px 16px;color:#111}.wrap{max-width:640px;margin:0 auto}h1{font-size:20px;font-weight:600;margin-bottom:6px}.sub{font-size:14px;color:#666;margin-bottom:24px}.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:16px}label{display:block;font-size:13px;color:#555;margin-bottom:4px;margin-top:12px}label:first-of-type{margin-top:0}input[type=text],input[type=password]{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px}.help{font-size:12px;color:#999;margin-top:4px}.btn{width:100%;padding:11px;font-size:15px;font-weight:600;background:#111;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:4px}.btn:disabled{opacity:.4;cursor:not-allowed}.btn:hover:not(:disabled){background:#333}.pbar-bg{background:#eee;border-radius:99px;height:8px;margin:8px 0}.pbar{background:#111;height:8px;border-radius:99px;width:0%;transition:width .3s}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.stat{background:#f9f9f9;border-radius:8px;padding:10px 12px}.stat-n{font-size:24px;font-weight:600}.stat-l{font-size:11px;color:#888;margin-top:2px}.logbox{background:#f9f9f9;border-radius:8px;padding:10px 12px;height:160px;overflow-y:auto;font-size:12px;font-family:monospace}.lok{color:#1a7a3f}.lerr{color:#c00}.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}.b-wae{background:#e8f0fe;color:#1a56db}.b-aae{background:#f0faf4;color:#1a7a3f}.b-other{background:#f5f5f5;color:#555}.b-err,.b-flag{background:#fff5f5;color:#c00}table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;font-size:11px;font-weight:600;color:#888;padding:6px 8px;border-bottom:1px solid #eee}td{padding:6px 8px;border-bottom:1px solid #f0f0f0;vertical-align:top}.tbl-wrap{max-height:260px;overflow-y:auto}#progress-section,#results-section{display:none}.err-box{display:none;font-size:13px;color:#c00;background:#fff5f5;border-radius:8px;padding:10px 14px;margin-top:8px}</style></head><body>
+<style>*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif}body{background:#f5f5f5;padding:32px 16px;color:#111}.wrap{max-width:640px;margin:0 auto}h1{font-size:20px;font-weight:600;margin-bottom:6px}.sub{font-size:14px;color:#666;margin-bottom:24px}.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:16px}label{display:block;font-size:13px;color:#555;margin-bottom:4px;margin-top:12px}label:first-of-type{margin-top:0}input[type=text],input[type=password]{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px}.help{font-size:12px;color:#999;margin-top:4px}.btn{width:100%;padding:11px;font-size:15px;font-weight:600;background:#111;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:4px}.btn:disabled{opacity:.4;cursor:not-allowed}.btn:hover:not(:disabled){background:#333}.pbar-bg{background:#eee;border-radius:99px;height:8px;margin:8px 0}.pbar{background:#111;height:8px;border-radius:99px;width:0%;transition:width .3s}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.stat{background:#f9f9f9;border-radius:8px;padding:10px 12px}.stat-n{font-size:24px;font-weight:600}.stat-l{font-size:11px;color:#888;margin-top:2px}.logbox{background:#f9f9f9;border-radius:8px;padding:10px 12px;height:160px;overflow-y:auto;font-size:12px;font-family:monospace}.lok{color:#1a7a3f}.lerr{color:#c00}.lwarn{color:#b07000}.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}.b-wae{background:#e8f0fe;color:#1a56db}.b-aae{background:#f0faf4;color:#1a7a3f}.b-other{background:#f5f5f5;color:#555}.b-err,.b-flag{background:#fff5f5;color:#c00}table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;font-size:11px;font-weight:600;color:#888;padding:6px 8px;border-bottom:1px solid #eee}td{padding:6px 8px;border-bottom:1px solid #f0f0f0;vertical-align:top}.tbl-wrap{max-height:260px;overflow-y:auto}#progress-section,#results-section{display:none}.err-box{display:none;font-size:13px;color:#c00;background:#fff5f5;border-radius:8px;padding:10px 14px;margin-top:8px}</style></head><body>
 <div class="wrap">
 <h1>Ango dialect classifier</h1>
-<p class="sub">Classifies audio as West African English, AAE, or Other — flags foreign language files.</p>
+<p class="sub">Pulls from all stages, classifies once per file, applies result to all chunks.</p>
 <div class="card">
 <label>Ango Hub API key</label><input type="password" id="ango-key" placeholder="feaa698b-..."/><p class="help">Ango Hub → profile menu → API key</p>
 <label>Ango Hub project ID</label><input type="text" id="project-id" placeholder="69e2571879d7e7c7fe5a0a3b"/><p class="help">From your URL: imerit.ango.ai/projects/THIS_PART</p>
 <label>OpenAI API key</label><input type="password" id="openai-key" placeholder="sk-..."/><p class="help">platform.openai.com → API keys → Create new key</p>
 <div class="err-box" id="err-box"></div>
-<div style="margin-top:16px"><button class="btn" id="start-btn" onclick="startProcessing()">Start classifying</button></div>
+<div style="margin-top:16px"><button class="btn" id="start-btn" onclick="startProcessing()">Start classifying all stages</button></div>
 </div>
-<div class="card" id="progress-section"><div style="display:flex;justify-content:space-between;font-size:13px;color:#666"><span id="prog-label">Starting...</span><span id="prog-pct">0%</span></div><div class="pbar-bg"><div class="pbar" id="pbar"></div></div><div class="stats"><div class="stat"><div class="stat-n" id="c-done">0</div><div class="stat-l">Done</div></div><div class="stat"><div class="stat-n" id="c-wae">0</div><div class="stat-l">West African</div></div><div class="stat"><div class="stat-n" id="c-aae">0</div><div class="stat-l">AAE</div></div><div class="stat"><div class="stat-n" id="c-flag">0</div><div class="stat-l">Flagged</div></div></div><div class="logbox" id="log"></div><button class="btn" style="background:#fff;color:#c00;border:1px solid #f5c5c5;margin-top:10px" onclick="stopProcessing()">Stop &amp; download what we have</button></div>
-<div id="results-section"><div class="card"><div class="tbl-wrap"><table><thead><tr><th>#</th><th>File</th><th>Dialect</th><th>Conf.</th><th>Foreign?</th><th>Reasoning</th></tr></thead><tbody id="tbody"></tbody></table></div><button class="btn" style="margin-top:12px" onclick="downloadCSV()">Download spreadsheet (CSV)</button></div></div>
+<div class="card" id="progress-section">
+<div style="font-size:12px;color:#888;margin-bottom:6px" id="stage-label">Fetching tasks...</div>
+<div style="display:flex;justify-content:space-between;font-size:13px;color:#666"><span id="prog-label">Starting...</span><span id="prog-pct">0%</span></div>
+<div class="pbar-bg"><div class="pbar" id="pbar"></div></div>
+<div class="stats">
+<div class="stat"><div class="stat-n" id="c-done">0</div><div class="stat-l">Classified</div></div>
+<div class="stat"><div class="stat-n" id="c-wae">0</div><div class="stat-l">West African</div></div>
+<div class="stat"><div class="stat-n" id="c-aae">0</div><div class="stat-l">AAE</div></div>
+<div class="stat"><div class="stat-n" id="c-flag">0</div><div class="stat-l">Flagged</div></div>
+</div>
+<div class="logbox" id="log"></div>
+<button class="btn" style="background:#fff;color:#c00;border:1px solid #f5c5c5;margin-top:10px" onclick="stopProcessing()">Stop &amp; download what we have</button>
+</div>
+<div id="results-section"><div class="card"><div class="tbl-wrap"><table><thead><tr><th>File</th><th>Chunk</th><th>Stage</th><th>Dialect</th><th>Conf.</th><th>Foreign?</th><th>Reasoning</th></tr></thead><tbody id="tbody"></tbody></table></div><button class="btn" style="margin-top:12px" onclick="downloadCSV()">Download spreadsheet (CSV)</button></div></div>
 </div>
 <script>
 const P='';
-let results=[],stopped=false,total=0,done=0,counts={wae:0,aae:0,flag:0};
+const STAGES=["Complete","Review","Label","Review #1","Review #2","Label WAE","SPQC"];
+let results=[],stopped=false,totalUnique=0,done=0,counts={wae:0,aae:0,flag:0};
+
 function log(msg,t){const el=document.getElementById('log');const d=document.createElement('div');d.className=t?'l'+t:'';d.textContent=new Date().toLocaleTimeString()+'  '+msg;el.appendChild(d);el.scrollTop=el.scrollHeight;}
-function updateStats(){document.getElementById('c-done').textContent=done;document.getElementById('c-wae').textContent=counts.wae;document.getElementById('c-aae').textContent=counts.aae;document.getElementById('c-flag').textContent=counts.flag;const pct=total>0?Math.round((done/total)*100):0;document.getElementById('pbar').style.width=pct+'%';document.getElementById('prog-pct').textContent=pct+'%';document.getElementById('prog-label').textContent=done+' of '+total+' tasks';}
-function addRow(r){const tb=document.getElementById('tbody');const tr=document.createElement('tr');const dc=r.dialect==='West African English'?'b-wae':r.dialect==='African American English'?'b-aae':r.error?'b-err':'b-other';const flag=r.foreign_language_flag?'<span class="badge b-flag">Yes — '+(r.foreign_language_name||'?')+'</span>':'—';tr.innerHTML=`<td>${done}</td><td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.external_id||r.task_id||'—'}</td><td><span class="badge ${dc}">${r.dialect||'err'}</span></td><td style="color:#888;font-size:11px">${r.confidence||'—'}</td><td>${flag}</td><td style="color:#888;font-size:11px;max-width:180px">${r.reasoning||r.error||'—'}</td>`;tb.prepend(tr);}
-async function fetchTasks(ak,pid){const all=[];let page=1;while(true){const r=await fetch(`${P}/ango?project=${encodeURIComponent(pid)}&page=${page}&limit=50`);if(!r.ok)throw new Error('Ango error '+r.status);const data=await r.json();const tasks=data?.data?.tasks||[];all.push(...tasks);const tot=data?.data?.total||all.length;log('Fetched page '+page+' — '+all.length+'/'+tot+' tasks');if(all.length>=tot||tasks.length===0)break;page++;}return all;}
+function updateStats(){document.getElementById('c-done').textContent=done;document.getElementById('c-wae').textContent=counts.wae;document.getElementById('c-aae').textContent=counts.aae;document.getElementById('c-flag').textContent=counts.flag;const pct=totalUnique>0?Math.round((done/totalUnique)*100):0;document.getElementById('pbar').style.width=pct+'%';document.getElementById('prog-pct').textContent=pct+'%';document.getElementById('prog-label').textContent=done+' of '+totalUnique+' unique files classified';}
+
+function addRows(chunks, classification){
+  const tb=document.getElementById('tbody');
+  for(const c of chunks){
+    const tr=document.createElement('tr');
+    const dc=classification.dialect==='West African English'?'b-wae':classification.dialect==='African American English'?'b-aae':classification.error?'b-err':'b-other';
+    const flag=classification.foreign_language_flag?'<span class="badge b-flag">Yes — '+(classification.foreign_language_name||'?')+'</span>':'—';
+    tr.innerHTML=`<td style="max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c.external_id}">${c.external_id||'—'}</td><td style="font-size:11px;color:#888">${c.task_id}</td><td style="font-size:11px;color:#888">${c.stage||'—'}</td><td><span class="badge ${dc}">${classification.dialect||'err'}</span></td><td style="color:#888;font-size:11px">${classification.confidence||'—'}</td><td>${flag}</td><td style="color:#888;font-size:11px;max-width:160px">${classification.reasoning||classification.error||'—'}</td>`;
+    tb.prepend(tr);
+  }
+}
+
+async function fetchStage(pid,stage){
+  const all=[];let page=1;
+  while(true){
+    const r=await fetch(`${P}/ango?project=${encodeURIComponent(pid)}&page=${page}&limit=50&stage=${encodeURIComponent(stage)}`);
+    if(!r.ok)break;
+    const data=await r.json();
+    const tasks=data?.data?.tasks||[];
+    all.push(...tasks.map(t=>({...t,_stage:stage})));
+    const tot=data?.data?.total||all.length;
+    if(all.length>=tot||tasks.length===0)break;
+    page++;
+  }
+  return all;
+}
+
 function extractUrl(t){const a=t.asset||t.data?.asset||'';if(typeof a==='string'&&a)return a;if(typeof a==='object'&&a)return a.data||a.url||null;return null;}
-async function processTask(task){const id=task._id||task.id||'unknown';const ext=task.externalId||task.name||'';const url=extractUrl(task);const r={task_id:id,external_id:ext,audio_url:url,whisper_language:null,transcript:null,dialect:null,foreign_language_flag:false,foreign_language_name:null,confidence:null,reasoning:null,error:null};if(!url){r.error='No audio URL';return r;}const dl=await fetch(`${P}/audio?url=${encodeURIComponent(url)}`);if(!dl.ok)throw new Error('Download failed');const {base64,mimeType}=await dl.json();const tx=await fetch(`${P}/openai-audio`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:base64,mimeType})});if(!tx.ok){const e=await tx.json();throw new Error('Whisper failed: '+(e.error||tx.status));}const txd=await tx.json();r.whisper_language=txd.language;r.transcript=txd.text;const cl=await fetch(`${P}/openai`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'https://api.openai.com/v1/chat/completions',body:{model:'gpt-4o',temperature:0,max_tokens:300,messages:[{role:'system',content:'You are an expert linguist. Classify dialect as exactly one of: "West African English", "African American English", or "Other". Report foreign_language_flag (true/false), foreign_language_name (or null), confidence ("high", "medium", or "low"), reasoning (1-2 sentences). Respond ONLY with valid JSON with all string values in double quotes.'},{role:'user',content:'Whisper detected: '+txd.language+'\n\nTranscript:\n'+txd.text}]}})});if(!cl.ok)throw new Error('GPT-4o failed');const cld=await cl.json();let raw2=cld.choices[0].message.content.trim().replace(/```json|```/g,'');raw2=raw2.replace(/:\s*([a-zA-Z][a-zA-Z]*)\s*([,}\n])/g,':"$1"$2');const parsed=JSON.parse(raw2);r.dialect=parsed.dialect;r.foreign_language_flag=parsed.foreign_language_flag||false;r.foreign_language_name=parsed.foreign_language_name||null;r.confidence=parsed.confidence;r.reasoning=parsed.reasoning;return r;}
+function getExtId(t){return t.externalId||t.asset?.externalId||t.name||t._id||'';}
+
+async function classifyTask(task){
+  const url=extractUrl(task);
+  if(!url)return{error:'No audio URL'};
+  const dl=await fetch(`${P}/audio?url=${encodeURIComponent(url)}`);
+  if(!dl.ok)throw new Error('Download failed');
+  const {base64,mimeType}=await dl.json();
+  const tx=await fetch(`${P}/openai-audio`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:base64,mimeType})});
+  if(!tx.ok){const e=await tx.json();throw new Error('Whisper failed: '+(e.error||tx.status));}
+  const txd=await tx.json();
+  const cl=await fetch(`${P}/openai`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'https://api.openai.com/v1/chat/completions',body:{model:'gpt-4o',temperature:0,max_tokens:300,messages:[{role:'system',content:'You are an expert linguist specializing in English dialect identification. Classify the PRIMARY spoken dialect as exactly one of: "West African English", "African American English", or "Other". Also report: foreign_language_flag (true if predominantly non-English like Spanish, French, Yoruba etc, otherwise false), foreign_language_name (language name or null), confidence ("high", "medium", or "low"), reasoning (1-2 sentences citing specific features). Respond ONLY with valid JSON, all values in double quotes.'},{role:'user',content:'Whisper detected language: '+txd.language+'\n\nTranscript:\n'+txd.text}]}})});
+  if(!cl.ok)throw new Error('GPT-4o failed');
+  const cld=await cl.json();
+  let raw=cld.choices[0].message.content.trim().replace(/```json|```/g,'');
+  raw=raw.replace(/:\s*([a-zA-Z][a-zA-Z\s]*[a-zA-Z])(\s*[,}\n])/g,(m,p1,p2)=>':"'+p1+'"'+p2);
+  const parsed=JSON.parse(raw);
+  return{
+    whisper_language:txd.language,
+    transcript:txd.text,
+    dialect:parsed.dialect,
+    foreign_language_flag:parsed.foreign_language_flag||false,
+    foreign_language_name:parsed.foreign_language_name||null,
+    confidence:parsed.confidence,
+    reasoning:parsed.reasoning,
+    error:null
+  };
+}
+
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-function stopProcessing(){stopped=true;log('Stopping...','err');setTimeout(()=>{if(results.length>0)downloadCSV();},2000);}
-async function startProcessing(){const ak=document.getElementById('ango-key').value.trim();const pid=document.getElementById('project-id').value.trim();const ok=document.getElementById('openai-key').value.trim();document.getElementById('err-box').style.display='none';if(!ak||!pid||!ok){const e=document.getElementById('err-box');e.style.display='block';e.textContent='Please fill in all three fields.';return;}await fetch(`${P}/set-keys`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({angoKey:ak,openaiKey:ok})});document.getElementById('start-btn').disabled=true;document.getElementById('progress-section').style.display='block';document.getElementById('results-section').style.display='block';stopped=false;results=[];done=0;counts={wae:0,aae:0,flag:0};updateStats();try{log('Connecting to Ango Hub...');const tasks=await fetchTasks(ak,pid);total=tasks.length;log('Found '+total+' tasks. Starting...','ok');updateStats();for(let i=0;i<tasks.length;i+=3){if(stopped)break;const batch=tasks.slice(i,i+3);const bres=await Promise.allSettled(batch.map(t=>processTask(t)));for(const br of bres){if(br.status==='fulfilled'){const r=br.value;results.push(r);done++;if(r.dialect==='West African English')counts.wae++;else if(r.dialect==='African American English')counts.aae++;if(r.foreign_language_flag)counts.flag++;if(r.error)log('Error: '+(r.external_id||r.task_id)+' — '+r.error,'err');else log('✓ '+(r.external_id||r.task_id)+' → '+r.dialect+' ('+r.confidence+')'+(r.foreign_language_flag?' FLAG: '+r.foreign_language_name:''),'ok');addRow(r);}else{done++;log('Task failed: '+br.reason,'err');}updateStats();}if(i+3<tasks.length&&!stopped)await sleep(600);}log(stopped?'Stopped. Downloading CSV...':'All done! Click download below.','ok');}catch(e){const eb=document.getElementById('err-box');eb.style.display='block';eb.textContent='Error: '+e.message;log('Fatal: '+e.message,'err');}document.getElementById('start-btn').disabled=false;}
-function downloadCSV(){const h=['task_id','external_id','audio_url','whisper_language','transcript','dialect','foreign_language_flag','foreign_language_name','confidence','reasoning','error'];const rows=[h.join(',')];for(const r of results)rows.push(h.map(k=>'"'+(r[k]==null?'':String(r[k])).replace(/"/g,'""')+'"').join(','));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));a.download='dialect_results.csv';a.click();}
+function stopProcessing(){stopped=true;log('Stopping — downloading current results...','warn');setTimeout(()=>{if(results.length>0)downloadCSV();},2000);}
+
+async function startProcessing(){
+  const ak=document.getElementById('ango-key').value.trim();
+  const pid=document.getElementById('project-id').value.trim();
+  const ok=document.getElementById('openai-key').value.trim();
+  document.getElementById('err-box').style.display='none';
+  if(!ak||!pid||!ok){const e=document.getElementById('err-box');e.style.display='block';e.textContent='Please fill in all three fields.';return;}
+  await fetch(`${P}/set-keys`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({angoKey:ak,openaiKey:ok})});
+  document.getElementById('start-btn').disabled=true;
+  document.getElementById('progress-section').style.display='block';
+  document.getElementById('results-section').style.display='block';
+  stopped=false;results=[];done=0;counts={wae:0,aae:0,flag:0};updateStats();
+
+  try{
+    // Step 1: Fetch all tasks from all stages
+    const grouped={};// extId -> [{task_id, external_id, stage, audio_url, task}]
+    for(const stage of STAGES){
+      if(stopped)break;
+      document.getElementById('stage-label').textContent=`Fetching stage: ${stage}...`;
+      log(`Fetching ${stage}...`);
+      const tasks=await fetchStage(pid,stage);
+      log(`  → ${tasks.length} tasks in ${stage}`,'ok');
+      for(const t of tasks){
+        const extId=getExtId(t);
+        const chunk={task_id:t._id||t.id||'',external_id:extId,stage,audio_url:extractUrl(t),task:t};
+        if(!grouped[extId])grouped[extId]=[];
+        grouped[extId].push(chunk);
+      }
+    }
+
+    // Step 2: Pick one random chunk per external ID to classify
+    const uniqueExtIds=Object.keys(grouped);
+    totalUnique=uniqueExtIds.length;
+    document.getElementById('stage-label').textContent=`${totalUnique} unique files found across all stages`;
+    log(`${totalUnique} unique files found. Classifying one chunk per file...`,'ok');
+    updateStats();
+
+    // Step 3: Classify in batches of 3
+    for(let i=0;i<uniqueExtIds.length;i+=3){
+      if(stopped)break;
+      const batch=uniqueExtIds.slice(i,i+3);
+      const bres=await Promise.allSettled(batch.map(async extId=>{
+        const chunks=grouped[extId];
+        const picked=chunks[Math.floor(Math.random()*chunks.length)];
+        const classification=await classifyTask(picked.task);
+        return{extId,chunks,classification};
+      }));
+
+      for(const br of bres){
+        if(br.status==='fulfilled'){
+          const{extId,chunks,classification}=br.value;
+          done++;
+          if(classification.dialect==='West African English')counts.wae++;
+          else if(classification.dialect==='African American English')counts.aae++;
+          if(classification.foreign_language_flag)counts.flag++;
+
+          // Add a row for every chunk with the same classification
+          for(const chunk of chunks){
+            const row={...chunk,...classification};
+            delete row.task;
+            results.push(row);
+          }
+
+          if(classification.error){
+            log('Error: '+extId+' — '+classification.error,'err');
+          } else {
+            log('✓ '+extId+' ('+chunks.length+' chunk'+(chunks.length>1?'s':'')+') → '+classification.dialect+' ('+classification.confidence+')'+(classification.foreign_language_flag?' ⚑ '+classification.foreign_language_name:''),'ok');
+          }
+          addRows(chunks,classification);
+        }else{
+          done++;
+          log('Failed: '+br.reason,'err');
+        }
+        updateStats();
+      }
+      if(i+3<uniqueExtIds.length&&!stopped)await sleep(600);
+    }
+    log(stopped?'Stopped. Downloading CSV...':'All done! Click download below.','ok');
+  }catch(e){
+    const eb=document.getElementById('err-box');eb.style.display='block';eb.textContent='Error: '+e.message;
+    log('Fatal: '+e.message,'err');
+  }
+  document.getElementById('start-btn').disabled=false;
+}
+
+function downloadCSV(){
+  const h=['external_id','task_id','stage','audio_url','dialect','foreign_language_flag','foreign_language_name','confidence','reasoning','whisper_language','transcript','error'];
+  const rows=[h.join(',')];
+  for(const r of results)rows.push(h.map(k=>'"'+(r[k]==null?'':String(r[k])).replace(/"/g,'""')+'"').join(','));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));
+  a.download='dialect_results.csv';
+  a.click();
+}
 </script>
 </body></html>
