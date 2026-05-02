@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
-import urllib.request, json, os, base64
+import urllib.request, json, os, base64, urllib.parse
 
 app = Flask(__name__, static_folder='.')
 ANGO_KEY = ""
@@ -38,8 +38,8 @@ def audio():
     headers = {"apikey": ANGO_KEY} if "ango.ai" in audio_url else {}
     req = urllib.request.Request(audio_url, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            raw = r.read()
+        with urllib.request.urlopen(req, timeout=55) as r:
+            raw = r.read(1024 * 1024)
             ct = r.headers.get("Content-Type","audio/wav")
         return cors(jsonify({"base64": base64.b64encode(raw).decode(), "mimeType": ct}))
     except Exception as e:
@@ -61,10 +61,12 @@ def openai_audio():
     req = urllib.request.Request('https://api.openai.com/v1/audio/transcriptions', parts,
         {'Authorization': f'Bearer {OPENAI_KEY}', 'Content-Type': f'multipart/form-data; boundary={boundary.decode()}'})
     try:
-        with urllib.request.urlopen(req, timeout=120) as r:
-            return cors(jsonify(json.loads(r.read())))
+        with urllib.request.urlopen(req, timeout=55) as r:
+            result = json.loads(r.read().decode('utf-8'))
+            return cors(jsonify(result))
     except urllib.error.HTTPError as e:
-        return cors(jsonify({"error": e.read().decode()})), e.code
+        error_body = e.read().decode('utf-8')
+        return cors(jsonify({"error": error_body})), e.code
 
 @app.route('/openai', methods=['POST','OPTIONS'])
 def openai():
@@ -74,8 +76,8 @@ def openai():
     req = urllib.request.Request(data['url'], json.dumps(data['body']).encode(),
         {'Authorization': f'Bearer {OPENAI_KEY}', 'Content-Type': 'application/json'})
     try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            return cors(jsonify(json.loads(r.read())))
+        with urllib.request.urlopen(req, timeout=55) as r:
+            return cors(jsonify(json.loads(r.read().decode('utf-8'))))
     except urllib.error.HTTPError as e:
         return cors(jsonify({"error": e.read().decode()})), e.code
 
