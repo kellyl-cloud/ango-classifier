@@ -121,9 +121,10 @@ async function findTaskByExternalId(projectId, externalId){
       const data=await r.json();
       const tasks=data&&data.data&&data.data.tasks?data.data.tasks:[];
       const match=tasks.find(function(t){
-        const tid=t.externalId||t.name||'';
-        return tid===externalId||tid.includes(externalId)||externalId.includes(tid);
-      });
+  const tid=(t.externalId||t.name||'').replace(/\.wav$/i,'').trim();
+  const eid=externalId.replace(/\.wav$/i,'').trim();
+  return tid===eid||tid.includes(eid)||eid.includes(tid);
+});
       if(match)return Object.assign({},match,{_stage:stage});
       const tot=data&&data.data?data.data.total||0:0;
       if(tasks.length===0||page*50>=tot)break;
